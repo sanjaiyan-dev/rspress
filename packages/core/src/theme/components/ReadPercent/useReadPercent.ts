@@ -9,16 +9,15 @@ export const useReadPercent = () => {
   useEffect(() => {
     const scrollElement = window || document.documentElement;
     const handler = () => {
-      const dom = document.querySelector('.rspress-doc');
+      const dom = document.querySelector<HTMLElement>('.rspress-doc');
       if (dom) {
-        const a = dom.getBoundingClientRect();
-        setH(a.height || 0);
+        setH(dom.offsetHeight || 0);
       }
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       setScrollTop(scrollTop);
     };
     handler();
-    scrollElement?.addEventListener('scroll', handler);
+    scrollElement?.addEventListener('scroll', handler, { passive: true });
     return () => {
       scrollElement?.removeEventListener('scroll', handler);
     };
