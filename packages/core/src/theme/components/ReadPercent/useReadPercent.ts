@@ -7,19 +7,31 @@ export const useReadPercent = () => {
   const { height } = useWindowSize();
 
   useEffect(() => {
+    let animRefId: number | null = null;
     const scrollElement = window || document.documentElement;
-    const handler = () => {
+    const update = () => {
       const dom = document.querySelector<HTMLElement>('.rspress-doc');
       if (dom) {
         setH(dom.offsetHeight || 0);
       }
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       setScrollTop(scrollTop);
+      animRefId = null;
     };
+
+    const handler = () => {
+      if (animRefId !== null) return;
+
+      animRefId = window.requestAnimationFrame(update);
+    };
+
     handler();
     scrollElement?.addEventListener('scroll', handler, { passive: true });
     return () => {
       scrollElement?.removeEventListener('scroll', handler);
+      if (animRefId !== null) {
+        window.cancelAnimationFrame(animRefId);
+      }
     };
   }, []);
 
@@ -32,5 +44,5 @@ export const useReadPercent = () => {
     );
   }, [h, scrollTop, height]);
 
-  return [readPercent, scrollTop];
+  return [readPercent, scrollTop] as const;
 };
